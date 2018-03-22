@@ -1,6 +1,7 @@
 const { Client } = require('pg')
 const fs = require('fs-extra')
 const path = require('path')
+const recursiveReadDir = require('recursive-readdir')
 
 function parseComments(file) {
   const lines = file.split('\n'), require = []
@@ -57,15 +58,7 @@ async function recreateEntities(config) {
   }
 
   if (!config.dropOnly) {
-    const functionFileNames = await fs.readdir(path.join(config.dir, 'functions'))
-    const triggerFileNames = await fs.readdir(path.join(config.dir, 'triggers'))
-    const viewFileNames = await fs.readdir(path.join(config.dir, 'views'))
-
-    const functionFilePaths = functionFileNames.map(fileName => path.join(config.dir, 'functions', fileName))
-    const triggerFilePaths = triggerFileNames.map(fileName => path.join(config.dir, 'triggers', fileName))
-    const viewFilePaths = viewFileNames.map(fileName => path.join(config.dir, 'views', fileName))
-
-    const filePaths = [...functionFilePaths, ...triggerFilePaths, ...viewFilePaths]
+    const filePaths = await recursiveReadDir(config.dir)
     const entities = await Promise.all(filePaths.map(async (filePath) => {
       const file = await fs.readFile(filePath, 'utf-8')
       return { ...parseComments(file), filePath, file }
