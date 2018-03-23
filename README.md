@@ -20,7 +20,7 @@ If, for example, function `baz()` depends on function `foo(bar integer)` at the 
 ```
 -- require functions/foo.sql
 ```
-Not that the path is relative to your `dir` and also `drop-code` and `require`s (you can specify multiple) can be in any order at the start of a file.
+Note that the path is relative to your `dir` and also `drop-code` and `require`s (you can specify multiple) can be in any order at the start of a file.
 
 # Usage
 
