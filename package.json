@@ -16,5 +16,6 @@
     "fs-extra": "^5.0.0",
     "pg": "^7.4.1",
     "recursive-readdir": "^2.2.2"
-  }
+  },
+  "keywords": ["pg", "function", "trigger", "view"]
 }
