@@ -1,6 +1,6 @@
 {
   "name": "pgcodebase",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "A tool for managing database functions, views and triggers",
   "main": "index.js",
   "scripts": {
@@ -13,9 +13,18 @@
   },
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^5.0.1",
     "fs-extra": "^5.0.0",
     "pg": "^7.4.1",
     "recursive-readdir": "^2.2.2"
   },
-  "keywords": ["pg", "function", "trigger", "view"]
+  "keywords": [
+    "pg",
+    "function",
+    "trigger",
+    "view"
+  ],
+  "bin": {
+    "pgcodebase": "./cli.js"
+  }
 }

@@ -23,7 +23,13 @@ pgcodebase({
 
 `pgcodebase` call returns Promise.
 
-If `createOnly` or `dropOnly` is true, then the script will only create or only drop entities respectfully. It is useful to specify `dropOnly` before table migrations and `createOnly` after.
+If `createOnly` or `dropOnly` is true, then the script will only create or only drop entities respectively. It is useful to specify `dropOnly` before table migrations and `createOnly` after.
+
+You can also install pgcodebase globally and use it from console. You will have to create `.env` file in the directory where you execute command. In `.env` there should be variables `PGUSER`, `PGHOST`, `PGPASSWORD`, `PGDATABASE`, `PGPORT` and `PGCODEBASE_DIR`. Last one should contain an absolute path to the directory with functions, triggers and views.
+
+```bash
+pgcodebase [--create-only] [--drop-only]
+```
 
 # Problem
 
@@ -42,10 +48,12 @@ Solution is a tool that drops and recreates all the functions, triggers and view
 
 # Code base
 
-All the sql that creates functions, triggers and views has to be in one directory at any depth. `dir` in config should be the absolute path to this folder. At the start of every sql file there *must* must be a line like
+All the sql that creates functions, triggers and views has to be in one directory at any depth. `dir` in config should be the absolute path to this folder. At the start of every sql file there *must* be a line like
 ```
 -- drop-code drop function foo(bar integer)
 ```
+After `drop-code` there should be a valid sql query that drops the entity created by this sql file.
+
 If, for example, function `baz()` depends on function `foo(bar integer)` at the start of the file `functions/baz.sql` there must be a line
 ```
 -- require functions/foo.sql
