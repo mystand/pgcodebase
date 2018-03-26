@@ -38,8 +38,8 @@ Have you ever worked with postgresql functions, triggers and views using migrati
 Let me demonstrate you on example. Say, you have a function `foo()` which depends on a function `bar()`. You want to change `bar()` signature to `bar(baz integer)`. Your sql migration code will be like this
 ```sql
 DROP FUNCTION foo();
-DROP FUNCTION baz();
-CREATE FUNCTION baz(baz integer) [...]
+DROP FUNCTION bar();
+CREATE FUNCTION bar(baz integer) [...]
 CREATE FUNCTION foo() [...]
 ```
 Imagine now you have multiple functions that depend on `bar()`. You will have to drop and recreate them all! This process becomes really painful as your codebase grows.
