@@ -7,7 +7,7 @@ function parseComments(file) {
   const lines = file.split('\n'), require = []
   let i = 0, dropCode = ''
 
-  while(lines[i].startsWith('--')) {
+  while(lines[i].startsWith('--') || lines[i].trim() === '') {
     if (lines[i].startsWith('-- drop-code')) {
       dropCode = lines[i].slice(13)
     }
