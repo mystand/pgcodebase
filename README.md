@@ -35,16 +35,11 @@ pgcodebase [--create-only] [--drop-only]
 
 Have you ever worked with postgresql functions, triggers and views using migrations? It becomes increasingly complex when your codebase grows. If you want to change the signature of some function, postgresql requires you to drop and recreate all the functions that depend on your function.
 
-Let me demonstrate you on example. Say, you have a function `foo()` which depends on a function `bar()`. You want to change `bar()` signature to `bar(baz integer)`. Your sql migration code will be like this
-```sql
-DROP FUNCTION foo();
-DROP FUNCTION bar();
-CREATE FUNCTION bar(baz integer) [...]
-CREATE FUNCTION foo() [...]
-```
-Imagine now you have multiple functions that depend on `bar()`. You will have to drop and recreate them all! This process becomes really painful as your codebase grows.
+Let me demonstrate you on an example. Usually you would create migrations to create functions. [Migration 1](./examples/bad/1_create_function_bar.sql) and [Migration 2](./examples/bad/2_create_function_foo.sql). Notice that function `foo` calls function `bar` therefore a dependency exists. Then if you need to modify body of the `bar` you will need to drop and recreate both functions: [Migration 3](./examples/bad/3_modify_function_bar.sql). Imagine now you have multiple functions that depend on `bar()`. You will have to drop and recreate them all! This process becomes really painful as your codebase grows.
 
-Solution is a tool that drops and recreates all the functions, triggers and views in the order that respects dependencies. Pgcodebase does exactly that. To remember the order in which those entities were created it fills a table named `pgcodebase_dropcodes`. This table contains lines of sql code that can be executed in the reverse order to drop all functions, triggers and views. You need to specify dependencies using `require` comment and also specify drop codes using `drop-code` comment in your sql files.
+A solution to the problem is a tool that drops and recreates all the functions, triggers and views in the order that respects dependencies. In our example you just have to create a folder and 2 files in it: [function_bar](./examples/good/pgcodebase/function_bar.sql) and [function_foo](./examples/good/pgcodebase/function_foo.sql). Then you can run `pgcodebase` whenever any change is made in those files.
+
+Internally pgcodebase after resolving dependencies drops all entities and starts filling a table named `pgcodebase_dropcodes` with sql specified using `drop-code` comment. Simultaneously it is creating entities in database. To drop entities it executes sql code from `pgcodebase_dropcodes` table in reverse order.
 
 # Code base
 
