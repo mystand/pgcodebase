@@ -6,3 +6,4 @@ AS $$
 BEGIN
     RETURN bar();
 END;
+$$;
