@@ -6,6 +6,8 @@ npm install pgcodebase
 
 # Usage
 
+Pgcodebase is a tool for easy management of postgresql functions, triggers and views inspired by [PgRebase](https://github.com/oelmekki/pgrebase).
+
 ```javascript
 const pgcodebase = require('pgcodebase')
 
