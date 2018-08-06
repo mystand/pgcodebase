@@ -1,6 +1,6 @@
 {
   "name": "pgcodebase",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A tool for easy management of postgresql functions, views and triggers",
   "main": "index.js",
   "scripts": {
