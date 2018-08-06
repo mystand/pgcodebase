@@ -39,10 +39,15 @@ async function recreateEntities(config) {
     host: config.host,
     password: config.password,
     database: config.database,
-    port: config.port
+    port: config.port,
+    connectionString: config.connectionString
   })
 
   await client.connect()
+
+  if (config.currentSchema) {
+    await client.query(`SET SCHEMA '${config.currentSchema}'`)
+  }
 
   await client.query('CREATE TABLE IF NOT EXISTS pgcodebase_dropcodes (id bigserial PRIMARY KEY, dropcode text)')
 
