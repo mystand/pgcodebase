@@ -18,6 +18,7 @@ pgcodebase({
   database: process.env.PGDATABASE,
   port: process.env.PGPORT,
   dir: path.join(__dirname, 'pgcodebase'),
+  schema: 'public',
   createOnly: false,
   dropOnly: false
 }).catch(console.error)
@@ -32,20 +33,22 @@ Usage: npx pgcodebase [options]
 
 Options:
 
--u, --user <user>          Postgresql user
--H, --host <host>          Postgresql host
--p, --password <password>  Postgresql password
--d, --database <database>  Postgresql database name
--P, --port <port>          Postgresql port
--D, --dir <dir>            Sql files directory
--c, --create-only          Only create entities in database, drop nothing
--r, --drop-only            Only drop entities in database, create nothing
--h, --help                 output usage information
+-u, --user <user>                           Postgresql user
+-H, --host <host>                           Postgresql host
+-p, --password <password>                   Postgresql password
+-d, --database <database>                   Postgresql database name
+-P, --port <port>                           Postgresql port
+-C, --connection-string <connectionString>  Postgresql connection string
+-s, --schema <schema>                       Postgresql schema to use
+-D, --dir <dir>                             Sql files directory
+-c, --create-only                           Only create entities in database, drop nothing
+-r, --drop-only                             Only drop entities in database, create nothing
+-h, --help                                  output usage information
 ```
 
 If `createOnly` or `dropOnly` is true, then the script will only create or only drop entities respectively. It is useful to specify `dropOnly` before table migrations and `createOnly` after.
 
-You can also configure pgcodebase using `.env` file. You will have to create `.env` file in the directory where you execute the command. In `.env` there should be variables `PGUSER`, `PGHOST`, `PGPASSWORD`, `PGDATABASE`, `PGPORT` and `PGCODEBASE_DIR`. Last one should contain an absolute or relative path to the directory with functions, triggers and views. Other variables are [standard for postgresql](https://www.postgresql.org/docs/9.3/static/libpq-envars.html).
+You can also configure pgcodebase using `.env` file. You will have to create `.env` file in the directory where you execute the command. In `.env` there may be variables `PGUSER`, `PGHOST`, `PGPASSWORD`, `PGDATABASE`, `PGPORT`, `PGCODEBASE_CONNECTION_STRING` and `PGCODEBASE_DIR`. Last one should contain an absolute or relative path to the directory with functions, triggers and views. Other variables (except for [`PGCODEBASE_CONNECTION_STRING`](https://www.postgresql.org/docs/10/static/libpq-connect.html#LIBPQ-CONNSTRING)) are [standard for postgresql](https://www.postgresql.org/docs/9.3/static/libpq-envars.html).
 
 # Problem
 

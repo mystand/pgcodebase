@@ -12,7 +12,7 @@ commander
   .option('-d, --database <database>', 'Postgresql database name')
   .option('-P, --port <port>', 'Postgresql port')
   .option('-C, --connection-string <connectionString>', 'Postgresql connection string')
-  .option('-s, --current-schema <currentSchema>', 'Default postgresql schema to use')
+  .option('-s, --schema <schema>', 'Postgresql schema to use')
   .option('-D, --dir <dir>', 'Sql files directory')
   .option('-c, --create-only', 'Only create entities in database, drop nothing')
   .option('-r, --drop-only', 'Only drop entities in database, create nothing')
@@ -28,5 +28,5 @@ pgcodebase({
   connectionString: commander.connectionString || process.env.PGCODEBASE_CONNECTION_STRING,
   createOnly: commander.createOnly,
   dropOnly: commander.dropOnly,
-  currentSchema: commander.currentSchema
+  schema: commander.schema
 }).catch(console.error)
