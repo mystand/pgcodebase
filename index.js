@@ -86,7 +86,9 @@ async function recreateEntities(config) {
     while(Object.keys(adjacencyLists).length !== 0) {
       let key = Object.keys(adjacencyLists)[0]
       const visited = [key]
-
+      if (!adjacencyLists[key]) {
+        throw new Error(`Required file "${key}" not found`);
+      }
       while (adjacencyLists[key].length !== 0) {
         key = adjacencyLists[key][0]
         if (visited.indexOf(key) > -1) {
