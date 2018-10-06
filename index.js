@@ -33,18 +33,7 @@ function removeNode(adjacencyLists, node) {
   })
 }
 
-async function recreateEntities(config) {
-  const client = new Client({
-    user: config.user,
-    host: config.host,
-    password: config.password,
-    database: config.database,
-    port: config.port,
-    connectionString: config.connectionString
-  })
-
-  await client.connect()
-
+async function syncFiles(client, config) {
   if (config.schema) {
     await client.query(`SET SCHEMA '${config.schema}'`)
   }
@@ -83,7 +72,7 @@ async function recreateEntities(config) {
       })
     })
 
-    while(Object.keys(adjacencyLists).length !== 0) {
+    while (Object.keys(adjacencyLists).length !== 0) {
       let key = Object.keys(adjacencyLists)[0]
       const visited = [key]
       if (!adjacencyLists[key]) {
@@ -103,8 +92,44 @@ async function recreateEntities(config) {
       removeNode(adjacencyLists, key)
     }
   }
+}
 
-  await client.end()
+async function recreateEntities(config) {
+  let client;
+  let usingExternalConnection = false;
+
+  try {
+    if (config.client) {
+      client = config.client
+      usingExternalConnection = true;
+    } else {
+      client = new Client({
+        user: config.user,
+        host: config.host,
+        password: config.password,
+        database: config.database,
+        port: config.port,
+        connectionString: config.connectionString
+      })
+
+      await client.connect()
+      await client.query('START TRANSACTION')
+    }
+
+    await syncFiles(client, config)
+    if (!usingExternalConnection) {
+      await client.query('COMMIT')
+    }
+  } catch (e) {
+    if (!usingExternalConnection) {
+      await client.query('ROLLBACK')
+    }
+    throw e;
+  } finally {
+    if (!usingExternalConnection) {
+      await client.end()
+    }
+  }
 }
 
 module.exports = recreateEntities
