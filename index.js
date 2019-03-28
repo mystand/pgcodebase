@@ -80,6 +80,9 @@ async function syncFiles(client, config) {
       }
       while (adjacencyLists[key].length !== 0) {
         key = adjacencyLists[key][0]
+        if (!adjacencyLists[key]) {
+          throw new Error(`Required file "${key}" not found`);
+        }
         if (visited.indexOf(key) > -1) {
           throw new Error(`Cyclic dependency for file: ${key}`)
         }
@@ -114,15 +117,18 @@ async function recreateEntities(config) {
 
       await client.connect()
       await client.query('START TRANSACTION')
+      console.log('START TRANSACTION')
     }
 
     await syncFiles(client, config)
     if (!usingExternalConnection) {
       await client.query('COMMIT')
+      console.log('COMMIT')
     }
   } catch (e) {
     if (!usingExternalConnection) {
       await client.query('ROLLBACK')
+      console.log('ROLLBACK')
     }
     throw e;
   } finally {
