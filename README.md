@@ -74,6 +74,12 @@ If, for example, function `baz()` depends on function `foo(bar integer)` at the 
 ```
 Note that the path is relative to your `dir` and also `drop-code` and `require`s (you can specify multiple) can be in any order at the start of a file.
 
+Also folder require is supported
+```
+--- required functions
+```
+In this case all folder files would be required as dependencies.
+
 # Inspiration
 
 This tool was inspired by [PgRebase](https://github.com/oelmekki/pgrebase). PgRebase, however, cannot process dependencies between different types of entities. If you have a view that depends on some function, you are out of luck. Pgcodebase doesn't care about the types of your entities. It can create and drop them in any order specified with `require`s.
