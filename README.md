@@ -48,11 +48,11 @@ Options:
 
 If `createOnly` or `dropOnly` is true, then the script will only create or only drop entities respectively. It is useful to specify `dropOnly` before table migrations and `createOnly` after.
 
-You can also configure pgcodebase using `.env` file. You will have to create `.env` file in the directory where you execute the command. In `.env` there may be variables `PGUSER`, `PGHOST`, `PGPASSWORD`, `PGDATABASE`, `PGPORT`, `PGCODEBASE_CONNECTION_STRING` and `PGCODEBASE_DIR`. Last one should contain an absolute or relative path to the directory with functions, triggers and views. Other variables (except for [`PGCODEBASE_CONNECTION_STRING`](https://www.postgresql.org/docs/10/static/libpq-connect.html#LIBPQ-CONNSTRING)) are [standard for postgresql](https://www.postgresql.org/docs/9.3/static/libpq-envars.html).
+You can also configure pgcodebase using `.env` file. You will have to create `.env` file in the directory where you execute the command. In `.env` there may be variables `PGUSER`, `PGHOST`, `PGPASSWORD`, `PGDATABASE`, `PGPORT`, `PGCODEBASE_CONNECTION_STRING` and `PGCODEBASE_DIR`. Last one should contain an absolute or relative path to the directory with functions, triggers, grants and views. Other variables (except for [`PGCODEBASE_CONNECTION_STRING`](https://www.postgresql.org/docs/10/static/libpq-connect.html#LIBPQ-CONNSTRING)) are [standard for postgresql](https://www.postgresql.org/docs/9.3/static/libpq-envars.html).
 
 # Problem
 
-Have you ever worked with postgresql functions, triggers and views using migrations? It becomes increasingly complex when your codebase grows. If you want to change the signature of some function, postgresql requires you to drop and recreate all the functions that depend on your function.
+Have you ever worked with postgresql functions, triggers, grants and views using migrations? It becomes increasingly complex when your codebase grows. If you want to change the signature of some function, postgresql requires you to drop and recreate all the functions that depend on your function.
 
 Let me demonstrate you on an example. Usually you would create migrations to create functions. [Migration 1](./examples/bad/1_create_function_bar.sql) and [Migration 2](./examples/bad/2_create_function_foo.sql). Notice that function `foo` calls function `bar` therefore a dependency exists. Then if you need to modify body of the `bar` you will need to drop and recreate both functions: [Migration 3](./examples/bad/3_modify_function_bar.sql). Imagine now you have multiple functions that depend on `bar()`. You will have to drop and recreate them all! This process becomes really painful as your codebase grows.
 
