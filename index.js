@@ -51,49 +51,65 @@ async function syncFiles(client, config) {
     await client.query('TRUNCATE TABLE pgcodebase_dropcodes RESTART IDENTITY')
   }
 
-  if (!config.dropOnly) {
-    const filePaths = await recursiveReadDir(config.dir)
-    const entities = await Promise.all(filePaths.map(async (filePath) => {
-      const file = await fs.readFile(filePath, 'utf-8')
-      return { ...parseComments(file), filePath, file }
-    }))
-    const entitiesByFilePath = entities.reduce(
-      (accumulator, entity) => ({ ...accumulator, [entity.filePath]: entity }),
-      {}
-    )
+  if (config.dropOnly) {
+    return;
+  }
 
-    const adjacencyLists = {}
-    entities.forEach(entity => {
-      if (!adjacencyLists[entity.filePath]) {
-        adjacencyLists[entity.filePath] = []
+  const filePaths = await recursiveReadDir(config.dir);
+  const entities = await Promise.all(filePaths.map(async (filePath) => {
+    const file = await fs.readFile(filePath, 'utf-8')
+    return { ...parseComments(file), filePath, file }
+  }))
+  const entitiesByFilePath = entities.reduce(
+    (accumulator, entity) => ({ ...accumulator, [entity.filePath]: entity }),
+    {}
+  )
+
+  const adjacencyLists = {}
+  entities.forEach(entity => {
+    if (!adjacencyLists[entity.filePath]) {
+      adjacencyLists[entity.filePath] = []
+    }
+    entity.require.forEach(relativePath => {
+      const configRelativePath = path.join(config.dir, relativePath)
+      let lstat;
+      try {
+        lstat = fs.lstatSync(path.resolve(process.cwd(), configRelativePath))
+      } catch (err) {
+        throw new Error(`Required file/folder "${relativePath}" not found`);
       }
-      entity.require.forEach(relativePath => {
-        adjacencyLists[entity.filePath].push(path.join(config.dir, relativePath))
+
+      const matchingPathes = lstat.isDirectory() ?
+        entities.filter(e => e.filePath.includes(configRelativePath)).map(x => x.filePath)
+        : [configRelativePath]
+
+      matchingPathes.forEach(matchingPath => {
+        adjacencyLists[entity.filePath].push(matchingPath);
       })
     })
+  })
 
-    while (Object.keys(adjacencyLists).length !== 0) {
-      let key = Object.keys(adjacencyLists)[0]
-      const visited = [key]
+  while (Object.keys(adjacencyLists).length !== 0) {
+    let key = Object.keys(adjacencyLists)[0]
+    const visited = [key]
+    if (!adjacencyLists[key]) {
+      throw new Error(`Required file "${key}" not found`);
+    }
+    while (adjacencyLists[key].length !== 0) {
+      key = adjacencyLists[key][0]
       if (!adjacencyLists[key]) {
         throw new Error(`Required file "${key}" not found`);
       }
-      while (adjacencyLists[key].length !== 0) {
-        key = adjacencyLists[key][0]
-        if (!adjacencyLists[key]) {
-          throw new Error(`Required file "${key}" not found`);
-        }
-        if (visited.indexOf(key) > -1) {
-          throw new Error(`Cyclic dependency for file: ${key}`)
-        }
-        visited.push(key)
+      if (visited.indexOf(key) > -1) {
+        throw new Error(`Cyclic dependency for file: ${key}`)
       }
-
-      console.log(key)
-      await client.query(entitiesByFilePath[key].file)
-      await client.query('INSERT INTO pgcodebase_dropcodes (dropcode) VALUES ($1)', [entitiesByFilePath[key].dropCode])
-      removeNode(adjacencyLists, key)
+      visited.push(key)
     }
+
+    console.log(key)
+    await client.query(entitiesByFilePath[key].file)
+    await client.query('INSERT INTO pgcodebase_dropcodes (dropcode) VALUES ($1)', [entitiesByFilePath[key].dropCode])
+    removeNode(adjacencyLists, key)
   }
 }
 
