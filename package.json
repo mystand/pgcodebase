@@ -16,7 +16,7 @@
     "commander": "^2.15.1",
     "dotenv": "^5.0.1",
     "fs-extra": "^5.0.0",
-    "pg": "^7.4.1",
+    "pg": "^8.5.1",
     "recursive-readdir": "^2.2.2"
   },
   "keywords": [
