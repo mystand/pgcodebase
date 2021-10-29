@@ -4,7 +4,7 @@ const path = require('path')
 const recursiveReadDir = require('recursive-readdir')
 
 function parseComments(file) {
-  const lines = file.split('\n'), require = []
+  const lines = file.split(/\r?\n/), require = []
   let i = 0, dropCode = ''
 
   while(lines[i].startsWith('--') || lines[i].trim() === '') {
